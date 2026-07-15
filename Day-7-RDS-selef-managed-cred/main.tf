@@ -96,7 +96,7 @@ resource "aws_security_group" "my_security_group" {
 
 
 
-resource "aws_db_instance" "name" {
+resource "aws_db_instance" "primary" {
     allocated_storage    = 20
     engine               = "mysql"
     engine_version       = "8.0"
@@ -115,15 +115,18 @@ resource "aws_db_instance" "name" {
   
 }
 
+
 resource "aws_db_instance" "replica" {
-    identifier = "mydbinstance-replica"
-    storage_type = "gp2"
-    allocated_storage = 20
-    engine = "mysql"
-    instance_class = "db.t3.micro"
-    replicate_source_db = aws_db_instance.name.id
-    vpc_security_group_ids = [aws_security_group.my_security_group.id]
-    #db_subnet_group_name = aws_db_subnet_group.my_subnet_group.name
-    
-  
+  identifier = "mydbinstance-replica"
+  replicate_source_db = aws_db_instance.primary.identifier
+  instance_class = "db.t3.micro"
+  publicly_accessible = false
+  skip_final_snapshot = true
+  vpc_security_group_ids = [
+    aws_security_group.my_security_group.id
+  ]
+
+  depends_on = [
+    aws_db_instance.name
+  ]
 }
