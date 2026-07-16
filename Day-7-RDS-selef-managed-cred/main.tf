@@ -125,8 +125,4 @@ resource "aws_db_instance" "replica" {
   vpc_security_group_ids = [
     aws_security_group.my_security_group.id
   ]
-
-  depends_on = [
-    aws_db_instance.name
-  ]
 }
